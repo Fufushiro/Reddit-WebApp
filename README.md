@@ -1,13 +1,28 @@
 # Reddit WebApp
 
-Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada.
+**Versión actual: 1.1**
+
+Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada, **con un sistema avanzado de filtrado de rastreo, scripts maliciosos y anuncios**.
 
 ## 📱 Descripción
 
 Reddit WebApp es una aplicación móvil para Android que permite a los usuarios acceder a Reddit de manera optimizada en dispositivos móviles. La aplicación utiliza un WebView para cargar la versión web de Reddit, proporcionando una experiencia integrada y fluida.
 
+### ¿Qué hace esta aplicación?
+
+Esta aplicación es un **cliente web nativo para Reddit** con un **sistema avanzado de seguridad y privacidad** que funciona en tres niveles:
+
+1. **Bloqueo de rastreo a nivel HTTP**: Intercepta y bloquea solicitudes a dominios de rastreo (Google Analytics, Facebook Pixel, etc.) antes de que se descarguen, reduciendo el consumo de datos y protegiendo tu privacidad.
+
+2. **Sanitización de HTML**: Limpia el contenido HTML antes de renderizarlo, eliminando scripts maliciosos, iframes no confiables y atributos peligrosos que podrían comprometer tu seguridad.
+
+3. **Protección del DOM**: Inyecta CSS y JavaScript después de que la página carga para ocultar anuncios y bloquear scripts que intenten cargarse dinámicamente, manteniendo una experiencia limpia y segura.
+
+**Resultado**: Navegas Reddit con mayor privacidad, sin anuncios molestos y con protección contra scripts de rastreo de terceros.
+
 ## ✨ Características
 
+### Funcionalidad Principal
 - **Acceso a Reddit integrado**: Carga la versión web de Reddit directamente en la aplicación
 - **JavaScript habilitado**: Soporte completo para funcionalidad interactiva de Reddit
 - **Almacenamiento local**: Permite que Reddit almacene datos locales (cookies, sesiones, etc.)
@@ -16,12 +31,21 @@ Reddit WebApp es una aplicación móvil para Android que permite a los usuarios 
 - **Optimización de pantalla**: Configuración automática para diferentes tamaños de pantalla
 - **Soporte de contenido mixto**: Permite cargar contenido HTTP y HTTPS
 
+### 🔒 Sistema de Seguridad y Filtrado (NUEVO)
+- **Bloqueo de rastreo**: Intercepta solicitudes a dominios de rastreo (Google Analytics, Facebook, etc.)
+- **Filtrado de scripts**: Elimina scripts maliciosos e intentos de inyección de código
+- **Bloqueo de anuncios**: Oculta contenido promocional, patrocinado y publicitario
+- **Sanitización de HTML**: Elimina iframes maliciosos, atributos peligrosos (onclick, data-*, etc.)
+- **Vigilancia de DOM**: Monitorea cambios dinámicos y bloquea scripts que intentan cargarse después
+- **Auditoría de seguridad**: Registra eventos de seguridad para debugging y análisis
+
 ## 🛠️ Requisitos Técnicos
 
-- Android SDK 24 (Android 7.0) o superior
+- **Android SDK 31** (Android 12.0) o superior
 - Conexión a Internet
 - AndroidX AppCompat
 - Kotlin
+- JDK 11 o superior
 
 ## 📋 Permisos Requeridos
 
@@ -59,6 +83,44 @@ git clone https://github.com/Fufushiro/Reddit-WebApp.git
 
 O desde Android Studio: `Ejecutar > Ejecutar 'app'`
 
+## 🔒 Sistema de Seguridad y Filtrado
+
+### Componentes de Seguridad
+
+#### 1. **ContentInterceptor** - Bloqueo HTTP
+- Intercepta solicitudes antes de descargar
+- Bloquea dominios de rastreo conocidos
+- Reduce consumo de banda
+
+#### 2. **ContentSanitizer** - Limpieza de HTML
+- Sanitiza HTML antes de renderizar
+- Elimina `<script>`, `<iframe>`, `<embed>`, `<object>`
+- Elimina atributos peligrosos (onclick, data-*, ng-*, jsaction)
+
+#### 3. **DOMStyleInjector** - Protección de DOM
+- Inyecta CSS que oculta anuncios
+- Inyecta JavaScript que vigila cambios
+- Bloquea scripts que intenten cargarse dinámicamente
+
+### Dominios Bloqueados
+- Google Analytics, Google Tag Manager
+- Facebook Pixel, DoubleClick, Hotjar
+- Y más de 15 dominios de rastreo conocidos
+
+### Cómo Extender los Filtros
+Ver documentación completa en: **`IMPLEMENTATION_GUIDE.md`**
+
+## 📚 Documentación
+
+### Documentación de Seguridad
+- **`IMPLEMENTATION_GUIDE.md`** - Guía completa de arquitectura e implementación
+- **`SECURITY_POLICY.kt`** - Políticas de seguridad y consideraciones legales
+- **`SECURITY_SUMMARY.md`** - Resumen ejecutivo del sistema
+- **`EXAMPLES.md`** - Ejemplos prácticos de uso y extensión
+
+### Historial de Cambios
+- **`CHANGELOG.md`** - Registro detallado de todos los cambios y versiones
+
 ## 📁 Estructura del Proyecto
 
 ```
@@ -67,6 +129,7 @@ Reddit-WebApp/
 │   ├── src/
 │   │   ├── main/
 │   │   │   ├── java/ia/ankherth/reddit/
+```
 │   │   │   │   └── MainActivity.kt
 │   │   │   ├── res/
 │   │   │   │   ├── layout/
@@ -84,24 +147,63 @@ Reddit-WebApp/
 
 ## 💻 Componentes Principales
 
-### MainActivity.kt
-Actividad principal que:
-- Configura el WebView para cargar Reddit
-- Implementa un cliente WebView personalizado
-- Maneja la progresión de carga
-- Gestiona la navegación hacia atrás
+### **MainActivity.kt**
+Actividad principal que integra todos los componentes de seguridad:
+- Inicializa ContentSanitizer y ContentInterceptor
+- Configura el WebView con ajustes de seguridad
+- Inyecta CSS y JavaScript de protección después de cargar
+- Maneja progresión de carga y navegación hacia atrás
+
+### **ContentSanitizer.kt**
+Sanitiza HTML antes de renderizarlo (~130 líneas):
+- Elimina etiquetas prohibidas (script, embed, object)
+- Limpia atributos peligrosos (onclick, data-*, ng-*)
+- Filtra iframes no confiables
+- Agrega headers de Content Security Policy
+
+### **ContentInterceptor.kt**
+Bloquea solicitudes HTTP sospechosas (~100 líneas):
+- Intercepta requests a dominios de rastreo
+- Previene descarga de recursos innecesarios
+- Registra intentos de seguridad
+
+### **DOMStyleInjector.kt**
+Inyecta protecciones después de renderizar (~250 líneas):
+- CSS que oculta anuncios y elementos promocionales
+- JavaScript que vigila cambios en DOM
+- Bloquea scripts que intenten cargarse dinámicamente
 
 ### Configuración de WebView
 - JavaScript habilitado para interactividad
 - DOM Storage y Database habilitados
 - Soporte para Vista Amplia (viewport)
 - Modo de contenido mixto (HTTP/HTTPS)
+- Protecciones de seguridad adicionales
 
 ## 🔧 Configuración
 
-La aplicación carga automáticamente `https://www.reddit.com` al iniciarse. Las configuraciones principales incluyen:
+La aplicación carga automáticamente `https://www.reddit.com` al iniciarse con el siguiente flujo:
+
+```
+1. WebView solicita página
+    ↓
+2. ContentInterceptor bloquea rastreo
+    ↓
+3. HTML se descarga
+    ↓
+4. ContentSanitizer limpia HTML
+    ↓
+5. WebView renderiza HTML limpio
+    ↓
+6. DOMStyleInjector inyecta CSS + JS
+    ↓
+7. Usuario ve Reddit sin rastreo/anuncios
+```
+
+Las configuraciones de seguridad principales son:
 
 ```kotlin
+```
 webView.settings.apply {
     javaScriptEnabled = true        // Permite JavaScript
     domStorageEnabled = true        // Almacenamiento DOM
@@ -149,6 +251,35 @@ Este proyecto está disponible bajo la licencia MIT.
 - GitHub: [@Fufushiro](https://github.com/Fufushiro)
 - Repositorio: [Reddit-WebApp](https://github.com/Fufushiro/Reddit-WebApp)
 
+## ⚠️ Términos de Servicio y Consideraciones Legales
+
+### Importante sobre el Sistema de Filtrado
+
+Este proyecto **modifica contenido entregado por Reddit**, lo cual:
+
+✅ **Permitido para:**
+- Uso personal y local
+- Evaluación privada
+- Investigación académica
+
+❌ **NO permitido para:**
+- Distribución comercial
+- Violación de Términos de Servicio de Reddit
+- Uso que viole derechos de Reddit
+
+### Evaluación de ToS
+- Modificar contenido: Puede violar ToS de Reddit
+- Bloquear rastreo: Equivalente a adblocker en navegador
+- Privacidad: Mejora privacidad del usuario pero reduce ingresos de Reddit
+
+**Recomendación:** Revisar Términos de Servicio antes de uso en producción:
+- https://www.reddit.com/r/reddit.com/wiki/user_agreement
+
+### Impacto en Reddit
+- Reduce ingresos por publicidad (anuncios no vistos)
+- Reduce datos de analytics
+- Reduce perfilado de usuarios
+
 ## 🐛 Reporte de Errores
 
 Si encuentras algún error o tienes sugerencias, por favor abre un issue en el repositorio de GitHub.
@@ -156,3 +287,7 @@ Si encuentras algún error o tienes sugerencias, por favor abre un issue en el r
 ---
 
 **Nota**: Esta aplicación es un cliente web para Reddit y depende de la disponibilidad y funcionalidad del sitio web de Reddit.
+
+**Seguridad**: El sistema de filtrado se proporciona como está. Úsalo responsablemente y respeta los términos de servicio.
+
+```
