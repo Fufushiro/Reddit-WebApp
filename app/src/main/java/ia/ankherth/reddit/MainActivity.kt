@@ -16,6 +16,9 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+        
+        // Ocultar el ActionBar (barra superior)
+        supportActionBar?.hide()
 
         webView = findViewById(R.id.webView)
         progressBar = findViewById(R.id.progressBar)
