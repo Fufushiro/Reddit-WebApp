@@ -26,6 +26,21 @@ object DOMStyleInjector {
     val BLOCKING_CSS = """
         <style>
         /* ============================================
+           ESPACIO PARA BARRA DE ESTADO / SAFE AREA
+           ============================================ */
+
+        html, body {
+            /* Fallback genérico para dejar espacio bajo la barra de estado */
+            padding-top: 24px !important;
+
+            /* Navegadores con soporte de safe-area (no afecta si no existe) */
+            padding-top: constant(safe-area-inset-top) !important;
+            padding-top: env(safe-area-inset-top) !important;
+
+            box-sizing: border-box !important;
+        }
+
+        /* ============================================
            BLOQUEADORES DE ANUNCIOS Y PROMOCIONALES
            ============================================ */
 
@@ -46,6 +61,18 @@ object DOMStyleInjector {
         .ad-banner,
         .ad-unit { 
             display: none !important; 
+        }
+
+        /* Ocultar enlaces (links) marcados como promoted/sponsored en el feed */
+        a[data-click-id*="sponsored"],
+        a[data-click-id*="promoted"],
+        a[aria-label*="promoted"],
+        a[aria-label*="sponsored"],
+        a[href*="utm_source=promo"],
+        a[href*="utm_medium=sponsored"],
+        a[href*="advertiser"],
+        a[href*="promoted"] {
+            display: none !important;
         }
 
         /* Ocultar divs que contienen la palabra 'ad' o 'sponsor' en atributos */

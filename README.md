@@ -1,8 +1,8 @@
 # Reddit WebApp
 
-**Versión actual: 1.1**
+**Versión actual: 1.2**
 
-Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada, **con un sistema avanzado de filtrado de rastreo, scripts maliciosos y anuncios**.
+Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada, **con un sistema avanzado de filtrado de rastreo, scripts maliciosos y anuncios**, ahora también con **mejor manejo de safe area y barra de estado** para evitar que el contenido se solape con la parte superior de la pantalla.
 
 ## 📱 Descripción
 

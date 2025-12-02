@@ -5,17 +5,70 @@
 # For more details, see
 #   http://developer.android.com/guide/developing/tools/proguard.html
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+# ============================================================================
+# REGLAS DE REDDIT WEBAPP
+# ============================================================================
 
-# Uncomment this to preserve the line number information for
-# debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+# Preservar clases de la aplicación
+-keep class ia.ankherth.reddit.** { *; }
 
-# If you keep the line number information, uncomment this to
-# hide the original source file name.
-#-renamesourcefileattribute SourceFile
+# Preservar enums
+-keepclassmembers enum * {
+    public static **[] values();
+    public static ** valueOf(java.lang.String);
+}
+
+# Preservar clases que tienen constructores sin argumentos
+-keepclasseswithmembers class * {
+    public <init>();
+}
+
+# WebView con JavaScript Interface
+-keepclassmembers class ia.ankherth.reddit.MainActivity$* {
+    public *;
+}
+
+-keepclassmembers class * {
+    @android.webkit.JavascriptInterface <methods>;
+}
+
+# ============================================================================
+# DEPENDENCIAS EXTERNAS
+# ============================================================================
+
+# OkHttp
+-dontwarn okhttp3.**
+-dontwarn okio.**
+-keep class okhttp3.** { *; }
+-keep class okio.** { *; }
+-keep interface okhttp3.** { *; }
+
+# Gson
+-dontwarn com.google.gson.**
+-keep class com.google.gson.** { *; }
+-keep interface com.google.gson.** { *; }
+
+# AndroidX
+-dontwarn androidx.**
+-keep class androidx.** { *; }
+-keep interface androidx.** { *; }
+
+# ============================================================================
+# DEPURACIÓN Y LOGGING
+# ============================================================================
+
+# Preservar información de línea de número para debugging
+-keepattributes SourceFile,LineNumberTable
+-renamesourcefileattribute SourceFile
+
+# ============================================================================
+# OPTIMIZACIONES
+# ============================================================================
+
+# Permitir acceso a clases privadas en proguard
+-allowaccessmodification
+
+# Asumir que el main está siendo usado
+-keep public class * {
+    public static void main(java.lang.String[]);
+}

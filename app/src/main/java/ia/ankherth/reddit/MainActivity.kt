@@ -4,9 +4,11 @@ import android.os.Bundle
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import android.webkit.WebChromeClient
+import android.webkit.WebSettings
 import android.view.View
 import android.widget.ProgressBar
 import androidx.appcompat.app.AppCompatActivity
+import androidx.activity.OnBackPressedCallback
 
 /**
  * MainActivity es el punto de entrada de la aplicación.
@@ -52,34 +54,34 @@ class MainActivity : AppCompatActivity() {
         webView.settings.apply {
             javaScriptEnabled = true              // Necesario para funcionalidad de Reddit
             domStorageEnabled = true              // Necesario para sesión
-            @Suppress("DEPRECATION")
             databaseEnabled = true                // Almacenamiento local
             useWideViewPort = true                // Viewport optimizado
             loadWithOverviewMode = true           // Modo de vista general
             mixedContentMode = android.webkit.WebSettings.MIXED_CONTENT_ALWAYS_ALLOW
-            
-            // SEGURIDAD ADICIONAL
-            // Desactivar plugins y características antiguas
-            @Suppress("DEPRECATION")
-            pluginState = android.webkit.WebSettings.PluginState.OFF
+
+            // CACHÉ: optimizar navegación reutilizando recursos ya cargados
+            // En Android moderno (API 18+), el caché se gestiona automáticamente
+            cacheMode = WebSettings.LOAD_DEFAULT  // Usa caché cuando es válido, si no, red
         }
-        
+
         // Configurar cliente web con interceptor
         webView.webViewClient = RedditWebViewClient(contentSanitizer, contentInterceptor)
         webView.webChromeClient = RedditWebChromeClient(progressBar)
-        
+
         // Cargar Reddit con componentes de seguridad activos
         webView.loadUrl("https://www.reddit.com")
-    }
 
-    @Deprecated("Usar OnBackPressedDispatcher", replaceWith = ReplaceWith("super.onBackPressed()"))
-    override fun onBackPressed() {
-        if (webView.canGoBack()) {
-            webView.goBack()
-        } else {
-            @Suppress("DEPRECATION")
-            super.onBackPressed()
-        }
+        // Configurar OnBackPressed usando la API moderna
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                if (webView.canGoBack()) {
+                    webView.goBack()
+                } else {
+                    isEnabled = false
+                    onBackPressed()
+                }
+            }
+        })
     }
 
     /**

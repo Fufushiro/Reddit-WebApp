@@ -5,6 +5,23 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.2] - 2025-12-02
+
+### 🔄 Modificado
+
+- **DOMStyleInjector.kt**:
+  - Ajustado el CSS inyectado para respetar la barra de estado y las safe areas mediante `padding-top` en `html, body`, evitando que el contenido web quede solapado por la parte superior de la pantalla.
+
+- **README.md**:
+  - Actualizada la versión a **1.2**.
+  - Documentado el nuevo manejo de safe area / barra de estado en la descripción principal.
+
+- **app/build.gradle.kts**:
+  - Actualizado `versionCode` a 3.
+  - Actualizado `versionName` a "1.2".
+
+---
+
 ## [1.1] - 2024
 
 ### ✨ Agregado
