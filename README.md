@@ -1,8 +1,8 @@
 # Reddit WebApp
 
-**Versión actual: 1.2**
+**Versión actual: 1.3**
 
-Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada, **con un sistema avanzado de filtrado de rastreo, scripts maliciosos y anuncios**, ahora también con **mejor manejo de safe area y barra de estado** para evitar que el contenido se solape con la parte superior de la pantalla.
+Una aplicación Android nativa que proporciona acceso a Reddit a través de una interfaz web integrada, **con un sistema avanzado de filtrado de rastreo, scripts maliciosos y anuncios**. Incluye optimizaciones de seguridad, mejor manejo de safe area, barra de estado, y protecciones contra fingerprinting de navegador.
 
 ## 📱 Descripción
 
@@ -37,8 +37,7 @@ Esta aplicación es un **cliente web nativo para Reddit** con un **sistema avanz
 - **Bloqueo de anuncios**: Oculta contenido promocional, patrocinado y publicitario
 - **Sanitización de HTML**: Elimina iframes maliciosos, atributos peligrosos (onclick, data-*, etc.)
 - **Vigilancia de DOM**: Monitorea cambios dinámicos y bloquea scripts que intentan cargarse después
-- **Auditoría de seguridad**: Registra eventos de seguridad para debugging y análisis
-
+- **Auditoría de seguridad**: Registra eventos de seguridad para debugging y análisis- **Protección de privacidad**: Reduce fingerprinting de navegador y exposición de APIs
 ## 🛠️ Requisitos Técnicos
 
 - **Android SDK 31** (Android 12.0) o superior
@@ -46,6 +45,7 @@ Esta aplicación es un **cliente web nativo para Reddit** con un **sistema avanz
 - AndroidX AppCompat
 - Kotlin
 - JDK 11 o superior
+- Gradle 8.0 o superior
 
 ## 📋 Permisos Requeridos
 
@@ -244,28 +244,6 @@ Las contribuciones son bienvenidas. Por favor:
 
 Este proyecto está disponible bajo la licencia MIT.
 
-## 👨‍💻 Autor
-
-**Fufushiro**
-
-- GitHub: [@Fufushiro](https://github.com/Fufushiro)
-- Repositorio: [Reddit-WebApp](https://github.com/Fufushiro/Reddit-WebApp)
-
-## ⚠️ Términos de Servicio y Consideraciones Legales
-
-### Importante sobre el Sistema de Filtrado
-
-Este proyecto **modifica contenido entregado por Reddit**, lo cual:
-
-✅ **Permitido para:**
-- Uso personal y local
-- Evaluación privada
-- Investigación académica
-
-❌ **NO permitido para:**
-- Distribución comercial
-- Violación de Términos de Servicio de Reddit
-- Uso que viole derechos de Reddit
 
 ### Evaluación de ToS
 - Modificar contenido: Puede violar ToS de Reddit

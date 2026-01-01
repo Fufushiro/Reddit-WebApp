@@ -168,11 +168,115 @@ object DOMStyleInjector {
     """.trimIndent()
 
     /**
+     * CSS anti-jank: Desabilita animaciones y transiciones innecesarias.
+     * Esto reduce layout shifts y reflows, haciendo el scroll más fluido.
+     * 
+     * OBJETIVO:
+     * - Eliminar animaciones CSS que causan jank
+     * - Deshabilitar transiciones largas
+     * - Forzar compositing de GPU donde sea posible
+     * - Reducir reflows causados por cambios de estilo
+     */
+    val ANTI_JANK_CSS = """
+        <style>
+        /* ============================================
+           REDUCCIÓN DE ANIMACIONES (Anti-Jank)
+           ============================================ */
+
+        /* Deshabilitar transiciones globales que causan jank */
+        *,
+        *::before,
+        *::after {
+            animation-duration: 0.01ms !important;
+            animation-iteration-count: 1 !important;
+            transition-duration: 0.01ms !important;
+        }
+
+        /* Permitir solo transiciones de opacidad (eficientes en GPU) */
+        [style*="transition"] {
+            transition: opacity 0.05s ease-out !important;
+        }
+
+        /* ============================================
+           OPTIMIZACIONES DE RENDERING
+           ============================================ */
+
+        /* Forzar compositing de GPU en elementos que se mueven frecuentemente */
+        article,
+        .Post,
+        [role="article"],
+        div[data-testid*="post"],
+        [data-testid*="comment"] {
+            will-change: contents;
+            transform: translateZ(0);
+            backface-visibility: hidden;
+        }
+
+        /* Optimizar scroll: deshabilitar pointer-events durante scroll */
+        html.is-scrolling * {
+            pointer-events: none !important;
+        }
+
+        /* ============================================
+           PREVENCIÓN DE LAYOUT SHIFTS
+           ============================================ */
+
+        /* Asegurar que contenedores mantienen dimensiones constantes */
+        main,
+        [role="main"],
+        article,
+        [role="article"] {
+            contain: layout style paint;
+        }
+
+        /* Deshabilitar reflows causados por scripts que cambian el DOM */
+        div[class*="Modal"],
+        div[class*="modal"],
+        div[class*="Popup"],
+        div[class*="popup"] {
+            contain: strict;
+        }
+
+        /* ============================================
+           OPTIMIZACIONES DE TEXTO Y VISIBILIDAD
+           ============================================ */
+
+        /* Deshabilitar text-indent y text-decoration que fuerzan reflows */
+        * {
+            text-rendering: optimizeSpeed !important;
+        }
+
+        /* Usar font-display: swap para no bloquear rendering */
+        @font-face {
+            font-display: swap;
+        }
+
+        /* ============================================
+           SCROLL PERFORMANCE
+           ============================================ */
+
+        /* Marcar elementos de scroll como passive listeners */
+        div[role="main"],
+        main,
+        [data-testid="sidebar"] {
+            -webkit-overflow-scrolling: touch;
+            scroll-behavior: auto !important;
+        }
+
+        /* Deshabilitar smooth-scroll que puede causar jank */
+        html {
+            scroll-behavior: auto !important;
+        }
+        </style>
+    """.trimIndent()
+
+    /**
      * JavaScript que se inyecta para:
      * 1. Vigilar cambios en el DOM
      * 2. Bloquear scripts que se cargan dinámicamente
      * 3. Limpiar atributos de rastreo
      * 4. Registrar intentos de seguridad
+     * 5. Optimizar scroll performance
      */
     val BLOCKING_JAVASCRIPT = """
         <script>
@@ -205,6 +309,10 @@ object DOMStyleInjector {
                 'onclick',
                 'onerror'
             ];
+
+            // Flag para control de scroll performance
+            let isScrolling = false;
+            let scrollTimeout;
 
             // ============================================
             // 1. BLOQUEO DE SCRIPTS DINÁMICOS
@@ -293,7 +401,41 @@ object DOMStyleInjector {
             });
 
             // ============================================
-            // 3. FUNCIONES AUXILIARES
+            // 3. OPTIMIZACIÓN DE SCROLL PERFORMANCE
+            // ============================================
+
+            /**
+             * Marca que se está haciendo scroll para optimizar rendering.
+             * Disabilita pointer-events durante scroll para evitar jank.
+             */
+            document.addEventListener('scroll', function() {
+                if (!isScrolling) {
+                    document.documentElement.classList.add('is-scrolling');
+                    isScrolling = true;
+                }
+                clearTimeout(scrollTimeout);
+                scrollTimeout = setTimeout(function() {
+                    document.documentElement.classList.remove('is-scrolling');
+                    isScrolling = false;
+                }, 150);
+            }, { passive: true });
+
+            // ============================================
+            // 4. BLOQUEO DE OBSERVADORES AGRESIVOS
+            // ============================================
+
+            /**
+             * Intercepta MutationObserver para evitar que se ejecuten
+             * observadores que pueden causar jank.
+             */
+            const originalObserverPrototype = MutationObserver.prototype;
+            const originalObserve = originalObserverPrototype.observe;
+
+            // Nota: No bloqueamos observadores porque reddit los necesita,
+            // pero podríamos limitar su frecuencia si fuera necesario.
+
+            // ============================================
+            // 5. FUNCIONES AUXILIARES
             // ============================================
 
             /**
@@ -385,7 +527,7 @@ object DOMStyleInjector {
             }
 
             // ============================================
-            // 4. EJECUCIÓN INICIAL
+            // 6. EJECUCIÓN INICIAL
             // ============================================
 
             // Limpiar el DOM existente cuando se inyecta
@@ -393,7 +535,7 @@ object DOMStyleInjector {
                 cleanDangerousAttributes(el);
             });
 
-            console.log('[SECURITY] DOM Security initialized');
+            console.log('[SECURITY] DOM Security initialized with anti-jank optimizations');
 
         })();
         </script>
@@ -403,6 +545,11 @@ object DOMStyleInjector {
      * Obtiene todo el código CSS necesario para inyectar.
      */
     fun getBlockingCSS(): String = BLOCKING_CSS
+
+    /**
+     * Obtiene CSS anti-jank para optimizar scroll performance.
+     */
+    fun getAntiJankCSS(): String = ANTI_JANK_CSS
 
     /**
      * Obtiene todo el código JavaScript necesario para inyectar.

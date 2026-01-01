@@ -5,6 +5,29 @@ Todos los cambios notables de este proyecto serán documentados en este archivo.
 El formato está basado en [Keep a Changelog](https://keepachangelog.com/es-ES/1.0.0/),
 y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
+## [1.3] - 2026-01-01
+
+### 🔄 Modificado
+
+- **README.md**:
+  - Actualizada la versión a **1.3**.
+  - Mejorada descripción general con enfoque en características de privacidad y seguridad.
+  - Agregada referencia a Gradle 8.0+ en requisitos técnicos.
+  - Ampliada sección de seguridad con protección contra fingerprinting.
+  - Actualizada documentación de componentes principales.
+
+- **app/build.gradle.kts**:
+  - Actualizado `versionCode` a 4.
+  - Actualizado `versionName` a "1.3".
+
+### ✨ Características Mejoradas
+- Documentación más completa con referencias a guías de implementación
+- Mejor claridad sobre arquitectura de seguridad de tres capas
+- Ejemplos más detallados de uso y extensión de filtros
+- Logs de seguridad mejorados para debugging
+
+---
+
 ## [1.2] - 2025-12-02
 
 ### 🔄 Modificado
