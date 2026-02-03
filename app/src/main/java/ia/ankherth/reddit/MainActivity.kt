@@ -20,8 +20,9 @@ import androidx.core.view.WindowInsetsControllerCompat
  * MainActivity es el punto de entrada de la aplicación.
  * 
  * COMPONENTES DE SEGURIDAD:
+    
  * 1. ContentSanitizer: Sanitiza HTML antes de renderizar
- * 2. ContentInterceptor: Bloquea solicitudes a dominios de rastreo
+    private val HARDENED_USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101 Firefox/102.0"
  * 3. DOMStyleInjector: Inyecta CSS y JavaScript para protección adicional
  * 4. RedditWebViewClient: Integra todos los componentes
  * 
@@ -92,27 +93,14 @@ class MainActivity : AppCompatActivity() {
      * Permite mostrar/ocultar la barra con swipe descendente.
      */
     private fun setupFullscreenMode() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
-            // Android 11+: API moderna y segura
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            
-            // Configurar insets controller para control de visibilidad de UI del sistema
-            val insetsController = WindowInsetsControllerCompat(window, window.decorView)
-            insetsController.hide(WindowInsetsCompat.Type.statusBars())
-            
-            // Permitir mostrar barra de estado con swipe desde arriba
-            insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
-        } else if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-            // Android 5.0+: API anterior pero compatible
-            @Suppress("DEPRECATION")
-            window.decorView.systemUiVisibility = (
-                View.SYSTEM_UI_FLAG_FULLSCREEN or
-                View.SYSTEM_UI_FLAG_LAYOUT_STABLE or
-                View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
-            )
-        }
-        
-        // Configuración adicional de ventana para reducir overhead
+        // Usar APIs modernas (WindowCompat + WindowInsetsControllerCompat)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        insetsController.hide(WindowInsetsCompat.Type.statusBars())
+        insetsController.systemBarsBehavior = WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
+
+        // Configuración adicional de ventana para reducir overhead y forzar HW accel
         window.addFlags(WindowManager.LayoutParams.FLAG_HARDWARE_ACCELERATED)
     }
 
@@ -207,6 +195,7 @@ class MainActivity : AppCompatActivity() {
                 println("[INJECTOR] CSS blocking layer injected")
 
                 // 2. INYECTAR CSS ANTI-JANK (disables animaciones y transiciones)
+                // Inyectar el CSS anti-jank usando evaluateJavascript (llamada corregida)
                 view.evaluateJavascript(
                     """javascript:(function() {
                         |var style = document.createElement('style');
@@ -255,4 +244,3 @@ private fun String.toJavaScriptString(): String {
         .replace("\t", "\\t")
     return "'$escaped'"
 }
-
